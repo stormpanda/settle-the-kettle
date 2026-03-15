@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, output } from '@angular/core';
 import { ALL_CHAPTERS } from '../../core/data/article-final.data';
 import { ScrollSpyService } from '../../core/services/scroll-spy';
 
@@ -12,10 +12,10 @@ import { ScrollSpyService } from '../../core/services/scroll-spy';
         @for (chapter of chapters; track chapter.id) {
           <li>
             <a [href]="'#' + chapter.id" 
-               class="block transition-colors font-medium leading-tight"
+               (click)="linkClicked.emit()"
+               class="block transition-colors font-medium leading-tight hover:text-signal"
                [class.text-signal]="isActive(chapter.id)"
-               [class.text-text-main]="!isActive(chapter.id)"
-               class="hover:text-signal">
+               [class.text-text-main]="!isActive(chapter.id)">
               {{ chapter.title }}
             </a>
             
@@ -24,6 +24,7 @@ import { ScrollSpyService } from '../../core/services/scroll-spy';
                 @for (section of chapter.sections; track section.id) {
                   <li>
                     <a [href]="'#' + section.id" 
+                       (click)="linkClicked.emit()"
                        class="block transition-colors line-clamp-2 hover:text-threema"
                        [class.text-threema]="isActive(section.id)"
                        [class.font-semibold]="isActive(section.id)"
@@ -43,6 +44,7 @@ import { ScrollSpyService } from '../../core/services/scroll-spy';
 })
 export class Sidebar {
   chapters = ALL_CHAPTERS;
+  linkClicked = output<void>();
   private scrollSpy = inject(ScrollSpyService);
 
   isActive(id: string): boolean {
