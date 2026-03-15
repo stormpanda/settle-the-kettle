@@ -17,6 +17,10 @@
 }
 
 @layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  
   body {
     @apply bg-bg-dark text-text-main m-0 p-0 antialiased selection:bg-signal selection:text-white;
     font-family: var(--font-sans);
