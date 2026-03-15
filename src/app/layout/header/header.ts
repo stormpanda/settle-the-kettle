@@ -1,10 +1,16 @@
-import { Component, output } from '@angular/core';
+import { Component, output, signal, ChangeDetectionStrategy } from '@angular/core';
 
 @Component({
   selector: 'app-header',
   imports: [],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  host: {
+    '(window:scroll)': 'onScroll()',
+    'class': 'block sticky top-0 z-50 w-full transition-transform duration-300 ease-in-out',
+    '[class.-translate-y-full]': 'isHidden()'
+  },
   template: `
-    <header class="sticky top-0 z-50 w-full border-b border-surface bg-bg-dark/80 backdrop-blur-md">
+    <header class="w-full border-b border-surface bg-bg-dark/90 backdrop-blur-md">
       <div class="max-w-7xl mx-auto flex h-16 items-center justify-between px-4 md:px-8">
         <a href="#" class="flex items-center gap-2">
           <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-signal to-threema text-white font-bold">
@@ -30,4 +36,28 @@ import { Component, output } from '@angular/core';
 })
 export class Header {
   toggleMenu = output<void>();
+  isHidden = signal(false);
+  private lastScrollY = 0;
+
+  onScroll() {
+    if (typeof window === 'undefined') return;
+    
+    const currentScrollY = window.scrollY;
+    
+    // Header only hides if scrolled decently past its own height
+    if (currentScrollY > 64) {
+      if (currentScrollY > this.lastScrollY && !this.isHidden()) {
+        // Scrolling down
+        this.isHidden.set(true);
+      } else if (currentScrollY < this.lastScrollY && this.isHidden()) {
+        // Scrolling up
+        this.isHidden.set(false);
+      }
+    } else {
+      // Always show at the absolute top
+      this.isHidden.set(false);
+    }
+    
+    this.lastScrollY = currentScrollY;
+  }
 }
